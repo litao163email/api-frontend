@@ -1,150 +1,166 @@
-import { addRule, removeRule, rule, updateRule } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import {
+  deleteInterfaceInfoUsingPOST,
+  listInterfaceInfoByPageUsingGET,
+  offlineInterfaceInfoUsingPOST,
+  onlineInterfaceInfoUsingPOST,
+  updateInterfaceInfoUsingPOST,
+} from '@/services/fastApi/interfaceInfoController';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
-  ModalForm,
   PageContainer,
   ProDescriptions,
-  ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
+import { Button, Drawer, message } from 'antd';
+import {} from 'antd/es/table/interface';
 import React, { useRef, useState } from 'react';
-import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import {listInterfaceInfoByPageUsingGET} from "@/services/fastApi/interfaceInfoController";
-import {SortOrder} from "antd/es/table/interface";
 
 /**
- * @en-US Add node
- * @zh-CN 添加节点
- * @param fields
+ * 页面主入口
+ * @constructor
  */
-const handleAdd = async (fields: API.RuleListItem) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('Added successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Adding failed, please try again!');
-    return false;
-  }
-};
-
-/**
- * @en-US Update node
- * @zh-CN 更新节点
- *
- * @param fields
- */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('Configuring');
-  try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
-
-    message.success('Configuration is successful');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Configuration failed, please try again!');
-    return false;
-  }
-};
-
-/**
- *  Delete node
- * @zh-CN 删除节点
- *
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
-  try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
-    });
-    hide();
-    message.success('Deleted successfully and will refresh soon');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Delete failed, please try again');
-    return false;
-  }
-};
-
 const TableList: React.FC = () => {
-  /**
-   * @en-US Pop-up window of new window
-   * @zh-CN 新建窗口的弹窗
-   *  */
-  const [createModalOpen, handleModalOpen] = useState<boolean>(false);
-  /**
-   * @en-US The pop-up window of the distribution update window
-   * @zh-CN 分布更新窗口的弹窗
-   * */
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-
   const [showDetail, setShowDetail] = useState<boolean>(false);
-
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
+  const [currentRow, setCurrentRow] = useState<API.InterfaceInfo>();
   const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
 
   /**
-   * @en-US International configuration
-   * @zh-CN 国际化配置
-   * */
+   * @en-US Update node
+   * @zh-CN 更新节点
+   * @param fields
+   */
+  const handleUpdate = async (fields: API.InterfaceInfo) => {
+    if (!currentRow) {
+      return;
+    }
+    const hide = message.loading('更新中');
+    try {
+      await updateInterfaceInfoUsingPOST({
+        id: currentRow.id,
+        ...fields,
+      });
+      hide();
+      message.success('Configuration is successful');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('Configuration failed, please try again!');
+      return false;
+    }
+  };
+
+  /**
+   * @en-US public node
+   * @zh-CN 发布
+   * @param record
+   */
+  const handlePublic = async (record: API.IdRequest) => {
+    const hide = message.loading('发布中');
+    if (!record) return true;
+    try {
+      await onlineInterfaceInfoUsingPOST({
+        id: record.id,
+      });
+      hide();
+      message.success('发布成功');
+      return true;
+    } catch (error) {
+      hide();
+      message.error('发布失败');
+      return false;
+    }
+  };
+
+  /**
+   * @en-US public node
+   * @zh-CN 下线
+   * @param record
+   */
+  const handleOffline = async (record: API.IdRequest) => {
+    const hide = message.loading('发布中');
+    if (!record) return true;
+    try {
+      await offlineInterfaceInfoUsingPOST({
+        id: record.id,
+      });
+      hide();
+      message.success('下线成功');
+      //刷新并拿到表格控制权
+      actionRef.current?.reload();
+      return true;
+    } catch (error) {
+      hide();
+      message.error('下线失败');
+      return false;
+    }
+  };
+
+  /**
+   * @en-US public node
+   * @zh-CN 删除
+   * @param record
+   */
+  const handleRemove = async (record: API.DeleteRequest) => {
+    const hide = message.loading('删除中');
+    if (!record) return true;
+    try {
+      await deleteInterfaceInfoUsingPOST({
+        id: record.id,
+      });
+      //加载状态
+      hide();
+      message.success('删除成功');
+      actionRef.current?.reload();
+      return true;
+    } catch (error) {
+      hide();
+      message.error('删除失败');
+      return false;
+    }
+  };
+
   const intl = useIntl();
 
   const columns: ProColumns<API.InterfaceInfo>[] = [
-
     {
       title: 'id',
       dataIndex: 'id',
-      valueType: "index"
+      valueType: 'index',
     },
     {
-      title: "接口名称",
+      title: '接口名称',
       dataIndex: 'name',
-      valueType: "text"
+      valueType: 'text',
     },
     {
       title: '描述',
       dataIndex: 'description',
-      valueType: "textarea"
+      valueType: 'textarea',
     },
     {
       title: '请求方法',
       dataIndex: 'method',
-      valueType: "textarea"
+      valueType: 'textarea',
     },
     {
       title: 'url',
       dataIndex: 'url',
-      valueType: "text"
+      valueType: 'text',
     },
     {
       title: '请求头',
       dataIndex: 'requestHeader',
-      valueType: "textarea"
+      valueType: 'textarea',
     },
     {
       title: '响应头',
       dataIndex: 'responseHeader',
-      valueType: "textarea"
+      valueType: 'textarea',
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="状态" />,
@@ -153,31 +169,25 @@ const TableList: React.FC = () => {
       valueEnum: {
         0: {
           text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.default"
-              defaultMessage="Shut down"
-            />
+            <FormattedMessage id="pages.searchTable.nameStatus.default" defaultMessage="关闭" />
           ),
           status: '关闭',
         },
         1: {
           text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
+            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="开启" />
           ),
-          status: '开启',
+          status: '在线',
         },
         2: {
           text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="Online" />
+            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="已上线" />
           ),
           status: '已上线',
         },
         3: {
           text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.abnormal"
-              defaultMessage="Abnormal"
-            />
+            <FormattedMessage id="pages.searchTable.nameStatus.abnormal" defaultMessage="异常" />
           ),
           status: '异常',
         },
@@ -186,18 +196,21 @@ const TableList: React.FC = () => {
     {
       title: '创建时间',
       dataIndex: 'createTime',
-      valueType: "dateTime"
+      valueType: 'dateTime',
     },
     {
       title: '更新时间',
       dataIndex: 'updateTime',
-      valueType: "dateTime"
+      valueType: 'dateTime',
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
+        // 操作栏
+
+        //修改
         <a
           key="config"
           onClick={() => {
@@ -205,18 +218,42 @@ const TableList: React.FC = () => {
             setCurrentRow(record);
           }}
         >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="配置" />
+          <FormattedMessage id="pages.searchTable.config" defaultMessage="修改" />
         </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage
-            id="pages.searchTable.subscribeAlert"
-            defaultMessage="预警"
-          />
+
+        <a
+          key="handlePublic"
+          onClick={() => {
+            handlePublic(record);
+          }}
+        >
+          <FormattedMessage id="pages.searchTable.subscribeAlert" defaultMessage="发布" />
+        </a>,
+
+        <a
+          key="handleOffline"
+          onClick={() => {
+            handleOffline(record);
+          }}
+        >
+          <FormattedMessage id="pages.searchTable.subscribeAlert" defaultMessage="下线" />
+        </a>,
+
+        <a
+          key="handleRemoce"
+          onClick={() => {
+            handleRemove(record);
+          }}
+        >
+          <FormattedMessage id="pages.searchTable.config" defaultMessage="删除" />
         </a>,
       ],
     },
   ];
 
+  // @ts-ignore
+  // @ts-ignore
+  // @ts-ignore
   return (
     <PageContainer>
       <ProTable<API.RuleListItem, API.PageParams>
@@ -229,32 +266,21 @@ const TableList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-          </Button>,
-        ]}
         //params、sort、filter都是request需要的参数，所以这个方法需要获取后返回给request
-        request={async (params, sort: Record<string, SortOrder>, filter: Record<string, (string | number)[] | null>)=>{
+        // @ts-ignore
+        request={async (params) => {
           //将params赋值给params给listInterfaceInfoByPageUsingGET使用
-          const res =await listInterfaceInfoByPageUsingGET({
-            ...params
+          const res = await listInterfaceInfoByPageUsingGET({
+            ...params,
           });
-          if(res.data){
+          if (res.data) {
             return {
               data: res.data.records,
               success: true,
               total: res.total,
-            }
+            };
           }
-        }
-        }
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -281,18 +307,6 @@ const TableList: React.FC = () => {
             </div>
           }
         >
-          <Button
-            onClick={async () => {
-              await handleRemove(selectedRowsState);
-              setSelectedRows([]);
-              actionRef.current?.reloadAndRest?.();
-            }}
-          >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
           <Button type="primary">
             <FormattedMessage
               id="pages.searchTable.batchApproval"
@@ -301,41 +315,8 @@ const TableList: React.FC = () => {
           </Button>
         </FooterToolbar>
       )}
-      <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: 'New rule',
-        })}
-        width="400px"
-        open={createModalOpen}
-        onOpenChange={handleModalOpen}
-        onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
-          if (success) {
-            handleModalOpen(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-      >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
-                />
-              ),
-            },
-          ]}
-          width="md"
-          name="name"
-        />
-        <ProFormTextArea width="md" name="desc" />
-      </ModalForm>
+
+      {/*自定义的更新组件*/}
       <UpdateForm
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
@@ -347,13 +328,14 @@ const TableList: React.FC = () => {
             }
           }
         }}
+        columns={columns}
         onCancel={() => {
           handleUpdateModalOpen(false);
           if (!showDetail) {
             setCurrentRow(undefined);
           }
         }}
-        updateModalOpen={updateModalOpen}
+        visible={updateModalOpen}
         values={currentRow || {}}
       />
 

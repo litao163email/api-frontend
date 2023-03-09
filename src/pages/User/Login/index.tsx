@@ -1,6 +1,7 @@
 import Footer from '@/components/Footer';
-import { login } from '@/services/ant-design-pro/api';
+import {} from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
+import { userLoginUsingPOST } from '@/services/fastApi/userController';
 import {
   AlipayCircleOutlined,
   LockOutlined,
@@ -16,12 +17,11 @@ import {
   ProFormText,
 } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { FormattedMessage, history, SelectLang, useIntl, useModel, Helmet } from '@umijs/max';
+import { FormattedMessage, Helmet, SelectLang, useIntl, useModel } from '@umijs/max';
 import { Alert, message, Tabs } from 'antd';
-import Settings from '../../../../config/defaultSettings';
 import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
-import {userLoginUsingPOST} from "@/services/fastApi/userController";
+import {} from 'react-dom';
+import Settings from '../../../../config/defaultSettings';
 
 const ActionIcons = () => {
   const langClassName = useEmotionCss(({ token }) => {
@@ -85,9 +85,9 @@ const LoginMessage: React.FC<{
 };
 
 const Login: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [userLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const { setInitialState } = useModel('@@initialState');
 
   const containerClassName = useEmotionCss(() => {
     return {
@@ -103,32 +103,18 @@ const Login: React.FC = () => {
 
   const intl = useIntl();
 
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
-      flushSync(() => {
-        setInitialState((s) => ({
-          ...s,
-          currentUser: userInfo,
-        }));
-      });
-    }
-  };
-
   const handleSubmit = async (values: API.UserLoginRequest) => {
     try {
       // 登录
       const res = await userLoginUsingPOST({ ...values });
       //以下信息可以自己定义，就像在niceplace里面一样
       if (res.data) {
-
-        //重定向
-        const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/welcome');
-        //登录成功后要将登录信息设置到全局信息中
-        setInitialState({
-          loginUser: res.data
+        await setInitialState({
+          loginUser: res.data,
         });
+        //重定向
+        window.location.href = '/';
+        //登录成功后要将登录信息设置到全局信息中
         return;
       }
       // 如果失败去设置用户错误信息
