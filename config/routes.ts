@@ -5,6 +5,8 @@ export default [
     layout: false,
     routes: [{ name: '登录', path: '/user/login', component: './User/Login' }],
   },
+  { name: 'API列表', icon: 'table', path: '/list', component: './Index' },
+  { name: 'API详情', icon: 'table', path: '/list/details/:id', component: './InterfaceDetails', hideInMenu:true},
   {
     name: '管理页',
     path: '/admin',
@@ -15,7 +17,7 @@ export default [
       { path: '/admin/sub-page', name: '二级管理页', component: './Admin' },
     ],
   },
-  { name: '管理API', icon: 'table', path: '/list/manger', component: './InterfaceInfo' },
+  { name: '管理API', icon: 'table', access: 'canAdmin',path: '/list/manger', component: './InterfaceInfo' },
   { path: '/', redirect: '/list/manger' },
   { path: '*', layout: false, component: './404' },
 ];

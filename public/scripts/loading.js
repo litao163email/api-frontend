@@ -194,7 +194,8 @@
           正在加载资源
         </div>
         <div class="loading-sub-title">
-          初次加载资源可能需要较多时间 请耐心等待
+          数据正在路上 请耐心等待
+          咨询请联系:litao163email@163.com
         </div>
       </div>
     `;

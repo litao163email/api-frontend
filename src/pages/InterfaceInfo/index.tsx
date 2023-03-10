@@ -13,7 +13,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, message } from 'antd';
+import { Button, Drawer, message, Pagination } from 'antd';
 import {} from 'antd/es/table/interface';
 import React, { useRef, useState } from 'react';
 import UpdateForm from './components/UpdateForm';
@@ -288,6 +288,7 @@ const TableList: React.FC = () => {
           },
         }}
       />
+
       {selectedRowsState?.length > 0 && (
         <FooterToolbar
           extra={
