@@ -67,7 +67,7 @@ const TableList: React.FC = () => {
       {
         name: 'API调用次数',
         type: 'pie',
-        radius: [50, 250],
+        radius: [0, 250],
         center: ['50%', '50%'],
         itemStyle: {
           emphasis: {
@@ -83,6 +83,7 @@ const TableList: React.FC = () => {
 
   return (
     <ReactECharts option={option} style={{height: 600}}/>
+
   )
     ;
 };

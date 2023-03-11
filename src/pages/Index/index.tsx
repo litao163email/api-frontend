@@ -15,6 +15,7 @@ import React, { useState,useEffect } from 'react';
 const TableList: React.FC = () => {
   const [list, setList] = useState<API.InterfaceInfo[]>([]);
   const [loading,setLoading]=useState<boolean>(false);
+  const [current, setCurrent] = useState(3);
 
   /**
    * @en-US Update node
@@ -22,7 +23,8 @@ const TableList: React.FC = () => {
    * @param page
    * @param pageSize
    */
-  const loadData = async (page:number=1) => {
+  const loadData = async (page:number) => {
+    setCurrent(page);
     setLoading(true);
     const hide = message.loading('加载中');
     try {
@@ -70,7 +72,7 @@ const TableList: React.FC = () => {
 
         }}
       />
-      <Pagination   showQuickJumper onChange={loadData} total={list.length} />
+      <Pagination current={current} onChange={loadData} total={50} />
     </PageContainer>
   );
 };

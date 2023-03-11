@@ -59,6 +59,7 @@ const TableList: React.FC = () => {
    */
   const onFinish = async (values :any) => {
     const hide = message.loading('加载中');
+    setInvokeLoading(true);
     try {
       const res = await invokeInterfaceInfoUsingPOST({
         id: Number(params.id),
@@ -67,18 +68,18 @@ const TableList: React.FC = () => {
       if (res.data) {
         setInvokeRes(res.data);
         hide();
-        setInvokeRes(true);
+        setInvokeLoading(false);
         message.success(res.data.message);
         return true;
       }else {
         hide();
         message.error(res.message);
-        setInvokeRes(true);
+        setInvokeLoading(false);
       }
     } catch (error) {
       hide();
       message.error("请求异常,请稍后重试");
-      setInvokeRes(true);
+      setInvokeLoading(false);
       return false;
     }
   };
