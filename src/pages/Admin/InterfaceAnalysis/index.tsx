@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import ReactECharts from 'echarts-for-react';
 import { message} from 'antd';
 import {listTopInvokeInterfaceInfoUsingGET} from '@/services/fastApi/analysisController';
+import moment from 'moment';
 
 
 /**
@@ -11,6 +12,7 @@ import {listTopInvokeInterfaceInfoUsingGET} from '@/services/fastApi/analysisCon
  */
 const TableList: React.FC = () => {
   const [data, setData] = useState<API.InterfaceInfoVO[]>([]);
+  const [time, settime] = useState<any>([]);
   /**
    * @en-US Update node
    * @zh-CN API分析饼状图
@@ -18,6 +20,8 @@ const TableList: React.FC = () => {
    */
   const loadData = async () => {
     const hide = message.loading('加载中');
+    const locatTime = moment().format("YYYY-MM-DD HH:mm:ss");
+    settime(locatTime);
     try {
       const res = await listTopInvokeInterfaceInfoUsingGET({});
       if (res.data) {
@@ -52,7 +56,7 @@ const TableList: React.FC = () => {
   const option = {
     title : {
       text: 'API调用次数',
-      subtext: '截止到当前时间为止',
+      subtext: '截止到当前时间：'+time,
       x:'center'
     },
     legend: {

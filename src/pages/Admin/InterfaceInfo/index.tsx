@@ -45,6 +45,8 @@ const TableList: React.FC = () => {
         ...fields,
       });
       hide();
+      //刷新并拿到表格控制权
+      actionRef.current?.reload();
       message.success('Configuration is successful');
       return true;
     } catch (error) {
@@ -67,6 +69,8 @@ const TableList: React.FC = () => {
         id: record.id,
       });
       hide();
+      //刷新并拿到表格控制权
+      actionRef.current?.reload();
       message.success('发布成功');
       return true;
     } catch (error) {
@@ -115,6 +119,7 @@ const TableList: React.FC = () => {
       //加载状态
       hide();
       message.success('删除成功');
+      //刷新并拿到表格控制权
       actionRef.current?.reload();
       return true;
     } catch (error) {
