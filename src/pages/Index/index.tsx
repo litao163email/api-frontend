@@ -7,7 +7,6 @@ import {
 import { List, message, Pagination } from 'antd';
 import {} from 'antd/es/table/interface';
 import React, { useState,useEffect } from 'react';
-
 /**
  * 页面主入口
  * @constructor
@@ -15,7 +14,7 @@ import React, { useState,useEffect } from 'react';
 const TableList: React.FC = () => {
   const [list, setList] = useState<API.InterfaceInfo[]>([]);
   const [loading,setLoading]=useState<boolean>(false);
-  const [current, setCurrent] = useState(3);
+  const [current, setCurrent] = useState(1);
 
   /**
    * @en-US Update node
@@ -46,7 +45,7 @@ const TableList: React.FC = () => {
   };
 
   useEffect(() => {
-    loadData();
+    loadData(current);
   }, []);
 
 
@@ -58,7 +57,7 @@ const TableList: React.FC = () => {
         itemLayout="horizontal"
         dataSource={list}
         renderItem={(item: API.InterfaceInfo) => {
-          const apiLink = `/list/details/${item.id}`;
+          const apiLink = `#/details/${item.id}`;
           return (
             <List.Item
               actions={[<a key="list-details" href={apiLink}>查看</a>]}
@@ -72,7 +71,7 @@ const TableList: React.FC = () => {
 
         }}
       />
-      <Pagination current={current} onChange={loadData} total={50} />
+      <Pagination current={current} onChange={loadData} total={30} />
     </PageContainer>
   );
 };

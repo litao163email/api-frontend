@@ -17,7 +17,7 @@ import {
   ProFormText,
 } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { FormattedMessage, Helmet, SelectLang, useIntl, useModel } from '@umijs/max';
+import { FormattedMessage, history, SelectLang, useIntl, useModel, Helmet } from '@umijs/max';
 import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import {} from 'react-dom';
@@ -114,6 +114,9 @@ const Login: React.FC = () => {
         });
         //重定向
         window.location.href = '/';
+        //重定向
+        // const urlParams = new URL(window.location.href).searchParams;
+        // history.push(urlParams.get('redirect') || '/list');
         //登录成功后要将登录信息设置到全局信息中
         return;
       }
@@ -153,7 +156,7 @@ const Login: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" src="/logo.svg" />}
-          title="API服务平台"
+          title="Better-API"
           subTitle={intl.formatMessage({ id: '专注于优质API开发' })}
           initialValues={{
             autoLogin: true,

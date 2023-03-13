@@ -40,18 +40,25 @@ const TableList: React.FC = () => {
     }
     const hide = message.loading('更新中');
     try {
-      await updateInterfaceInfoUsingPOST({
+      const res = await updateInterfaceInfoUsingPOST({
         id: currentRow.id,
         ...fields,
       });
       hide();
-      //刷新并拿到表格控制权
-      actionRef.current?.reload();
-      message.success('Configuration is successful');
-      return true;
+      if(res.code===0){
+        message.success(res.message);
+        //刷新并拿到表格控制权
+        actionRef.current?.reload();
+        return true;
+      }else {
+        message.error(res.message);
+        //刷新并拿到表格控制权
+        actionRef.current?.reload();
+        return false;
+      }
     } catch (error) {
       hide();
-      message.error('Configuration failed, please try again!');
+      message.error('更新错误!');
       return false;
     }
   };
@@ -65,14 +72,21 @@ const TableList: React.FC = () => {
     const hide = message.loading('发布中');
     if (!record) return true;
     try {
-      await onlineInterfaceInfoUsingPOST({
+      const res = await onlineInterfaceInfoUsingPOST({
         id: record.id,
       });
       hide();
-      //刷新并拿到表格控制权
-      actionRef.current?.reload();
-      message.success('发布成功');
-      return true;
+      if(res.code===0){
+        message.success(res.message);
+        //刷新并拿到表格控制权
+        actionRef.current?.reload();
+        return true;
+      }else {
+        message.error(res.message);
+        //刷新并拿到表格控制权
+        actionRef.current?.reload();
+        return false;
+      }
     } catch (error) {
       hide();
       message.error('发布失败');
@@ -89,14 +103,21 @@ const TableList: React.FC = () => {
     const hide = message.loading('发布中');
     if (!record) return true;
     try {
-      await offlineInterfaceInfoUsingPOST({
+      const res = await offlineInterfaceInfoUsingPOST({
         id: record.id,
       });
       hide();
-      message.success('下线成功');
-      //刷新并拿到表格控制权
-      actionRef.current?.reload();
-      return true;
+      if(res.code===0){
+        message.success(res.message);
+        //刷新并拿到表格控制权
+        actionRef.current?.reload();
+        return true;
+      }else {
+        message.error(res.message);
+        //刷新并拿到表格控制权
+        actionRef.current?.reload();
+        return false;
+      }
     } catch (error) {
       hide();
       message.error('下线失败');
@@ -113,15 +134,22 @@ const TableList: React.FC = () => {
     const hide = message.loading('删除中');
     if (!record) return true;
     try {
-      await deleteInterfaceInfoUsingPOST({
+      const res = await deleteInterfaceInfoUsingPOST({
         id: record.id,
       });
       //加载状态
       hide();
-      message.success('删除成功');
-      //刷新并拿到表格控制权
-      actionRef.current?.reload();
-      return true;
+      if(res.code===0){
+        message.success(res.message);
+        //刷新并拿到表格控制权
+        actionRef.current?.reload();
+        return true;
+      }else {
+        message.error(res.message);
+        //刷新并拿到表格控制权
+        actionRef.current?.reload();
+        return false;
+      }
     } catch (error) {
       hide();
       message.error('删除失败');

@@ -1,11 +1,10 @@
 import {
   getInterfaceInfoByIdUsingGET, invokeInterfaceInfoUsingPOST,
-  listInterfaceInfoByPageUsingGET,
 } from '@/services/fastApi/interfaceInfoController';
 import {
   PageContainer,
 } from '@ant-design/pro-components';
-import {Button, Card, Descriptions, Divider, Form, Input, message} from 'antd';
+import {Button, Card, Descriptions, Divider, Form, message} from 'antd';
 import {} from 'antd/es/table/interface';
 import React, {useState, useEffect} from 'react';
 import {useParams} from "@@/exports";
@@ -22,8 +21,7 @@ const TableList: React.FC = () => {
   //调用结果的状态
   const [invokeLoading, setInvokeLoading] = useState(false);
   //使用url中的参数
-  const params = useParams();
-
+  const {id} = useParams<any>();
 
   /**
    * @en-US Update node
@@ -33,9 +31,10 @@ const TableList: React.FC = () => {
   const loadData = async () => {
     setLoading(true);
     const hide = message.loading('加载中');
+    console.log("参数id是："+id)
     try {
       const res = await getInterfaceInfoByIdUsingGET({
-        id: Number(params.id),
+        id: Number(id),
       });
       if (res.data) {
         setData(res.data);
@@ -62,7 +61,7 @@ const TableList: React.FC = () => {
     setInvokeLoading(true);
     try {
       const res = await invokeInterfaceInfoUsingPOST({
-        id: Number(params.id),
+        id: Number(id),
         ...values
       });
       if (res.data) {
